@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class BookSeeder extends Seeder
 {
@@ -13,7 +13,7 @@ class BookSeeder extends Seeder
      * 書籍の初期データを投入する
      */
     public function run(): void
-    {   
+    {
         $user = User::first();
 
         $books = [
@@ -124,9 +124,9 @@ class BookSeeder extends Seeder
 
             $book = Book::firstOrCreate(
                 ['isbn' => $bookData['isbn']],
-                array_merge($bookData, ['user_id' => $user->id])   
+                array_merge($bookData, ['user_id' => $user->id])
             );
-            
+
             $genreIds = Genre::whereIn('name', $genres)->pluck('id');
             $book->genres()->sync($genreIds);
         }
