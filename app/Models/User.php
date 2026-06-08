@@ -64,7 +64,7 @@ class User extends Authenticatable
     /**
      * ユーザーがお気に入りに登録した本の一覧を取得する
      */
-    public function favorites(): BelongsToMany
+    public function favoriteBooks(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'favorites')->withTimestamps();
     }
@@ -72,7 +72,7 @@ class User extends Authenticatable
     /**
      * ユーザーがいいねしたレビューの一覧を取得する
      */
-    public function likes(): BelongsToMany
+    public function likedReviews(): BelongsToMany
     {
         return $this->belongsToMany(Review::class, 'review_likes')->withTimestamps();
     }

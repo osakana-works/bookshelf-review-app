@@ -32,7 +32,7 @@ class Review extends Model
     /**
      * レビューにいいねしたユーザーの一覧を取得する
      */
-    public function likes(): BelongsToMany
+    public function likedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'review_likes')->withTimestamps();
     }

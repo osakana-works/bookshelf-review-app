@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('author');
             $table->string('isbn', 20)->unique();
-            $table->date('published_at');
+            $table->date('published_date');
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
