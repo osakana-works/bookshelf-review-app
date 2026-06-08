@@ -9,12 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Genre extends Model
 {
     use HasFactory;
+
     protected $fillable = ['name'];
 
     /**
      * ジャンルに紐づく本の一覧を取得する
-     *
-     * @return BelongsToMany
      */
     public function books(): BelongsToMany
     {

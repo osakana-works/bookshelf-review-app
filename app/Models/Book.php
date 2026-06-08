@@ -11,22 +11,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Book extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'author','isbn','published_at', 'description',"image_url", 'user_id'];
+
+    protected $fillable = ['title', 'author', 'isbn', 'published_at', 'description', 'image_url', 'user_id'];
 
     /**
      * 本を登録したユーザーを取得する
-     *
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class); 
+        return $this->belongsTo(User::class);
     }
 
     /**
      * 本に紐づくレビューの一覧を取得する
-     *
-     * @return HasMany
      */
     public function reviews(): HasMany
     {
@@ -35,8 +32,6 @@ class Book extends Model
 
     /**
      * 本に紐づくジャンルの一覧を取得する
-     *
-     * @return BelongsToMany
      */
     public function genres(): BelongsToMany
     {
@@ -45,8 +40,6 @@ class Book extends Model
 
     /**
      * 本をお気に入り登録したユーザーの一覧を取得する
-     *
-     * @return BelongsToMany
      */
     public function favoritedBy(): BelongsToMany
     {
