@@ -9,12 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Like extends Model
 {
     use HasFactory;
+
     protected $fillable = ['user_id', 'review_id'];
 
     /**
      * いいねしたユーザーを取得する
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -23,8 +22,6 @@ class Like extends Model
 
     /**
      * いいねしたレビューを取得する
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function review(): BelongsTo
     {
