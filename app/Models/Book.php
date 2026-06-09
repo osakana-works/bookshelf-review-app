@@ -45,4 +45,16 @@ class Book extends Model
     {
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
     }
+
+    /**
+     * キャストするべき属性
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'published_date' => 'date',
+        ];
+    }
 }
