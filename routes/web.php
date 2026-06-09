@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
@@ -19,22 +20,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    // 仮ルート
-    Route::get('/favorites', function () {
-        return view('favorites.index');
-    })->name('favorites.index');
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/books/{book}/favorites', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
 // 公開ルート
 Route::get('/ranking', function () {
     return view('ranking.index');
 })->name('ranking.index');
-
-// 仮ルート
-Route::post('/books/{book}/favorites', function () {
-    return redirect()->back();
-})->name('favorites.toggle');
-
-Route::post('/books/{book}/aaa', function () {
-    return redirect()->back();
-})->name('reviews.like');
