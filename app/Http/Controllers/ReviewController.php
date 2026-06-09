@@ -15,7 +15,6 @@ class ReviewController extends Controller
      */
     public function store(ReviewRequest $request, Book $book): RedirectResponse
     {
-        dump($request->all());
         $book->reviews()->create([
             'user_id' => auth()->id(),
             'rating' => $request->rating,
