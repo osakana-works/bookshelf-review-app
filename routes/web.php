@@ -4,12 +4,14 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 // 公開ルート（ゲストもアクセス可能）
 Route::get('/', [BookController::class, 'index']);
 Route::resource('books', BookController::class)->only(['index', 'show']);
+Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 
 // 認証が必要なルート
 Route::middleware('auth')->group(function () {
@@ -26,8 +28,3 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/reviews/{review}/like', [LikeController::class, 'toggle'])->name('reviews.like');
 });
-
-// 公開ルート
-Route::get('/ranking', function () {
-    return view('ranking.index');
-})->name('ranking.index');
