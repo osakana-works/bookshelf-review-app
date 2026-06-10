@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 // 公開ルート（ゲストもアクセス可能）
 Route::get('/', [BookController::class, 'index']);
-Route::resource('books', BookController::class)->only(['index', 'show']);
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 
 // 認証が必要なルート
@@ -28,3 +28,5 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/reviews/{review}/like', [LikeController::class, 'toggle'])->name('reviews.like');
 });
+
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
