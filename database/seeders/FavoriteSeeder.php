@@ -26,7 +26,7 @@ class FavoriteSeeder extends Seeder
         foreach ($favorites as $email => $bookIndexes) {
             $user = User::where('email', $email)->first();
             $bookIds = $books->whereIn('id', $bookIndexes)->pluck('id');
-            $user->favorites()->syncWithoutDetaching($bookIds);
+            $user->favoriteBooks()->syncWithoutDetaching($bookIds);
         }
     }
 }
