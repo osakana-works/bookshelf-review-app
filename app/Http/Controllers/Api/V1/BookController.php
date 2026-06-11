@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\BookRequest;
+use App\Http\Requests\Api\V1\BookSearchRequest;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
 use Illuminate\Http\JsonResponse;
@@ -15,13 +16,15 @@ class BookController extends Controller
     /**
      * 書籍一覧を取得する
      */
-    public function index(): AnonymousResourceCollection
+    public function index(BookSearchRequest $request): AnonymousResourceCollection
     {
         $books = Book::with('genres')
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
+            ->searchByKeyword($request->keyword)
+            ->filterByGenre($request->genre_id)
             ->latest()
-            ->paginate(20);
+            ->paginate($request->per_page ?? 20);
 
         return BookResource::collection($books);
     }
