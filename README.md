@@ -143,8 +143,8 @@ http://localhost
 7. **フロントエンドのビルド**
 
 ```bash
-    npm install
-    npm run dev
+    sail npm install
+    sail npm run dev
 ```
 
 8. **アプリケーションへのアクセス**
