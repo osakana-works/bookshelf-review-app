@@ -21,7 +21,7 @@ erDiagram
     varchar title
     varchar author
     varchar isbn
-    date published_at
+    date published_date
     text description
     varchar image_url
     bigint_unsigned user_id FK
@@ -49,7 +49,7 @@ erDiagram
     timestamp created_at
     timestamp updated_at
   }
-  likes {
+  review_likes {
     bigint_unsigned user_id FK
     bigint_unsigned review_id FK
     timestamp created_at
@@ -59,10 +59,10 @@ erDiagram
   users ||--o{ books : "登録"
   users ||--o{ reviews : "投稿"
   users ||--o{ favorites : "お気に入り"
-  users ||--o{ likes : "いいね"
+  users ||--o{ review_likes : "いいね"
   books ||--o{ reviews : "レビュー"
   books ||--o{ book_genre : "分類"
   books ||--o{ favorites : "お気に入り"
   genres ||--o{ book_genre : "ジャンル"
-  reviews ||--o{ likes : "いいね"
+  reviews ||--o{ review_likes : "いいね"
 ```
