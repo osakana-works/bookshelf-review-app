@@ -53,7 +53,7 @@ class FavoriteTest extends TestCase
         $response = $this->actingAs($user)->post("/books/{$book->id}/favorites");
 
         $response->assertRedirect();
-        $this->assertDatabaseHas('favorites', [
+        $this->assertDatabaseHas('book_user', [
             'user_id' => $user->id,
             'book_id' => $book->id,
         ]);
@@ -74,7 +74,7 @@ class FavoriteTest extends TestCase
         $response = $this->actingAs($user)->post("/books/{$book->id}/favorites");
 
         $response->assertRedirect();
-        $this->assertDatabaseMissing('favorites', [
+        $this->assertDatabaseMissing('book_user', [
             'user_id' => $user->id,
             'book_id' => $book->id,
         ]);
