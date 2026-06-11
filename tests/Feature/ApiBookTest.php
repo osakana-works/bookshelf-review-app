@@ -214,4 +214,65 @@ class ApiBookTest extends TestCase
             ],
         ]);
     }
+
+    /**
+     * キーワード検索で書籍を絞り込めるテスト
+     */
+    public function test_can_search_books_by_keyword(): void
+    {
+        $targetBook = Book::factory()->create(['title' => 'Laravel入門']);
+        $otherBook = Book::factory()->create(['title' => 'PHP基礎']);
+
+        $response = $this->getJson('/api/v1/books?keyword=Laravel');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['title' => 'Laravel入門']);
+        $response->assertJsonMissing(['title' => 'PHP基礎']);
+    }
+
+    /**
+     * 著者名でキーワード検索できるテスト
+     */
+    public function test_can_search_books_by_author(): void
+    {
+        $targetBook = Book::factory()->create(['author' => '夏目漱石']);
+        $otherBook = Book::factory()->create(['author' => 'テスト著者']);
+
+        $response = $this->getJson('/api/v1/books?keyword=夏目漱石');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['author' => '夏目漱石']);
+        $response->assertJsonMissing(['author' => 'テスト著者']);
+    }
+
+    /**
+     * ジャンルIDで書籍を絞り込めるテスト
+     */
+    public function test_can_filter_books_by_genre(): void
+    {
+        $genre = Genre::factory()->create();
+        $targetBook = Book::factory()->create();
+        $otherBook = Book::factory()->create();
+
+        $targetBook->genres()->attach($genre->id);
+
+        $response = $this->getJson("/api/v1/books?genre_id={$genre->id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['id' => $targetBook->id]);
+        $response->assertJsonMissing(['id' => $otherBook->id]);
+    }
+
+    /**
+     * per_pageで件数を変更できるテスト
+     */
+    public function test_can_change_per_page(): void
+    {
+        Book::factory()->count(5)->create();
+
+        $response = $this->getJson('/api/v1/books?per_page=3');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('meta.per_page', 3);
+    }
 }
