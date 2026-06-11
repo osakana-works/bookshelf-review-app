@@ -29,7 +29,7 @@ class BookRequest extends FormRequest
             'published_date' => ['required', 'date'],
             'description' => ['nullable', 'string'],
             'image_url' => ['nullable', 'url', 'max:255'],
-            'genres' => ['nullable', 'array'],
+            'genres' => ['required', 'array', 'min:1'],
             'genres.*' => ['exists:genres,id'],
         ];
     }
@@ -52,6 +52,8 @@ class BookRequest extends FormRequest
             'image_url.url' => '画像URLは正しいURL形式で入力してください。',
             'genres.array' => 'ジャンルの形式が正しくありません。',
             'genres.*.exists' => '選択されたジャンルが存在しません。',
+            'genres.required' => 'ジャンルを1つ以上選択してください。',
+            'genres.min' => 'ジャンルを1つ以上選択してください。',
         ];
     }
 }
