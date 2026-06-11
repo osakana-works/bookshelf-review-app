@@ -27,6 +27,7 @@ class BookResource extends JsonResource
                 'id' => $genre->id,
                 'name' => $genre->name,
             ])),
+            'reviews' => $this->whenLoaded('reviews', fn () => ReviewResource::collection($this->reviews)),
             'reviews_avg_rating' => $this->reviews_avg_rating,
             'reviews_count' => $this->reviews_count,
             'created_at' => $this->created_at,

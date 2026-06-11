@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -186,5 +187,31 @@ class ApiBookTest extends TestCase
     {
         $response = $this->deleteJson('/api/v1/books/9999');
         $response->assertStatus(404);
+    }
+
+    /**
+     * 書籍詳細にレビュー情報が含まれるテスト
+     */
+    public function test_book_detail_includes_reviews(): void
+    {
+        $book = Book::factory()->create();
+        $review = Review::factory()->create(['book_id' => $book->id]);
+
+        $response = $this->getJson("/api/v1/books/{$book->id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                'reviews' => [
+                    '*' => [
+                        'id',
+                        'user_name',
+                        'rating',
+                        'comment',
+                        'created_at',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

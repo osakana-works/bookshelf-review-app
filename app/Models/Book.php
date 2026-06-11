@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,5 +57,30 @@ class Book extends Model
         return [
             'published_date' => 'date',
         ];
+    }
+
+    /**
+     * キーワードで検索するスコープ
+     */
+    public function scopeSearchByKeyword(Builder $query, ?string $keyword): Builder
+    {
+        return $query->when($keyword, function ($q) use ($keyword) {
+            $q->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('author', 'like', "%{$keyword}%");
+            });
+        });
+    }
+
+    /**
+     * ジャンルで絞り込むスコープ
+     */
+    public function scopeFilterByGenre(Builder $query, ?int $genreId): Builder
+    {
+        return $query->when($genreId, function ($q) use ($genreId) {
+            $q->whereHas('genres', function ($q) use ($genreId) {
+                $q->where('genres.id', $genreId);
+            });
+        });
     }
 }
