@@ -126,6 +126,7 @@ class BookTest extends TestCase
     {
         $user = User::factory()->create();
         $book = Book::factory()->create(['user_id' => $user->id]);
+        $genre = Genre::factory()->create();
 
         $response = $this->actingAs($user)->put("/books/{$book->id}", [
             'title' => '更新タイトル',
@@ -134,7 +135,7 @@ class BookTest extends TestCase
             'published_date' => $book->published_date,
             'description' => $book->description,
             'image_url' => $book->image_url,
-            'genres' => [],
+            'genres' => [$genre->id],
         ]);
 
         $response->assertRedirect();
@@ -152,6 +153,7 @@ class BookTest extends TestCase
         $owner = User::factory()->create();
         $other = User::factory()->create();
         $book = Book::factory()->create(['user_id' => $owner->id]);
+        $genre = Genre::factory()->create();
 
         $response = $this->actingAs($other)->put("/books/{$book->id}", [
             'title' => '更新タイトル',
@@ -160,7 +162,7 @@ class BookTest extends TestCase
             'published_date' => $book->published_date,
             'description' => $book->description,
             'image_url' => $book->image_url,
-            'genres' => [],
+            'genres' => [$genre->id],
         ]);
 
         $response->assertStatus(403);

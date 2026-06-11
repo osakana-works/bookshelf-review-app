@@ -25,7 +25,7 @@ class BookRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'author' => ['required', 'string', 'max:255'],
-            'isbn' => ['required', 'digits:13', 'unique:books,isbn,' . $this->book?->id],
+            'isbn' => ['required', 'digits:13', 'unique:books,isbn,'.$this->book?->id],
             'published_date' => ['required', 'date'],
             'description' => ['nullable', 'string'],
             'image_url' => ['nullable', 'url', 'max:255'],
@@ -53,7 +53,7 @@ class BookRequest extends FormRequest
             'genres.array' => 'ジャンルの形式が正しくありません。',
             'genres.*.exists' => '選択されたジャンルが存在しません。',
             'genres.required' => 'ジャンルを1つ以上選択してください。',
-            'genres.min'      => 'ジャンルを1つ以上選択してください。',
+            'genres.min' => 'ジャンルを1つ以上選択してください。',
         ];
     }
 }
