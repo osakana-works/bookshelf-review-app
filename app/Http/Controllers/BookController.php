@@ -6,21 +6,28 @@ use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookController extends Controller
 {
     /**
      * 書籍一覧を表示する
+     *
+     * @param  Request  $request  リクエスト（keyword・genre・sortを含む）
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $books = Book::with(['genres', 'reviews'])
             ->withAvg('reviews', 'rating')
-            ->latest()
+            ->searchByKeyword($request->keyword)
+            ->filterByGenre($request->genre)
+            ->sortBy($request->sort)
             ->paginate(10);
 
-        return view('books.index', compact('books'));
+        $genres = Genre::all();
+
+        return view('books.index', compact('books', 'genres'));
     }
 
     /**
@@ -35,6 +42,8 @@ class BookController extends Controller
 
     /**
      * 書籍を登録する
+     *
+     * @param  BookRequest  $request  バリデーション済みリクエスト
      */
     public function store(BookRequest $request): RedirectResponse
     {
@@ -57,6 +66,8 @@ class BookController extends Controller
 
     /**
      * 書籍詳細を表示する
+     *
+     * @param  Book  $book  書籍モデル
      */
     public function show(Book $book): View
     {
@@ -67,6 +78,8 @@ class BookController extends Controller
 
     /**
      * 書籍編集フォームを表示する
+     *
+     * @param  Book  $book  書籍モデル
      */
     public function edit(Book $book): View
     {
@@ -78,6 +91,9 @@ class BookController extends Controller
 
     /**
      * 書籍を更新する
+     *
+     * @param  BookRequest  $request  バリデーション済みリクエスト
+     * @param  Book  $book  書籍モデル
      */
     public function update(BookRequest $request, Book $book): RedirectResponse
     {
@@ -101,6 +117,8 @@ class BookController extends Controller
 
     /**
      * 書籍を削除する
+     *
+     * @param  Book  $book  書籍モデル
      */
     public function destroy(Book $book): RedirectResponse
     {
