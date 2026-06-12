@@ -30,3 +30,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
+// 適当ルート
+Route::get('/books/aaaaaa', [BookController::class, 'show'])->name('reports.index');
+Route::get('/books/bbbbb', [BookController::class, 'show'])->name('reading-plans.index');
+Route::get('/books/cccc', [BookController::class, 'show'])->name('notifications.index');

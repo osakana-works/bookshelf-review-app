@@ -15,6 +15,10 @@ class Book extends Model
 
     protected $fillable = ['title', 'author', 'isbn', 'published_date', 'description', 'image_url', 'user_id'];
 
+    protected $casts = [
+        'published_date' => 'date',
+    ];
+
     /**
      * 本を登録したユーザーを取得する
      */
@@ -48,19 +52,11 @@ class Book extends Model
     }
 
     /**
-     * キャストするべき属性
+     * タイトルまたは著者名でキーワード検索するスコープ
      *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'published_date' => 'date',
-        ];
-    }
-
-    /**
-     * キーワードで検索するスコープ
+     * @param  Builder  $query  クエリビルダ
+     * @param  string|null  $keyword  検索キーワード
+     * @return Builder 絞り込まれたクエリビルダ
      */
     public function scopeSearchByKeyword(Builder $query, ?string $keyword): Builder
     {
@@ -73,7 +69,11 @@ class Book extends Model
     }
 
     /**
-     * ジャンルで絞り込むスコープ
+     * ジャンルIDで絞り込むスコープ
+     *
+     * @param  Builder  $query  クエリビルダ
+     * @param  int|null  $genreId  ジャンルID
+     * @return Builder 絞り込まれたクエリビルダ
      */
     public function scopeFilterByGenre(Builder $query, ?int $genreId): Builder
     {
@@ -82,5 +82,24 @@ class Book extends Model
                 $q->where('genres.id', $genreId);
             });
         });
+    }
+
+    /**
+     * ソート順で並び替えるスコープ
+     *
+     * @param  Builder  $query  クエリビルダ
+     * @param  string|null  $sort  ソート順（newest/oldest/title/rating）
+     * @return Builder ソートされたクエリビルダ
+     */
+    public function scopeSortBy(Builder $query, ?string $sort): Builder
+    {
+        return match ($sort) {
+            'oldest' => $query->oldest(),
+            'title' => $query->orderBy('title'),
+            'rating' => $query->withAvg('reviews', 'rating')
+                ->orderByDesc('reviews_avg_rating')
+                ->orderByDesc('id'),
+            default => $query->latest()
+        };
     }
 }
