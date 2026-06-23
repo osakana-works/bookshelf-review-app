@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [BookController::class, 'index']);
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 
+// 認証が必要なルート
 Route::middleware('auth')->group(function () {
     Route::resource('genres', GenreController::class);
 
@@ -27,6 +29,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
     Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
     Route::put('/books/{book}', [BookController::class, 'update'])->name('books.update');
+
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
@@ -47,7 +54,3 @@ Route::get('/aaaaa', function () {
 Route::get('/aaaaaa', function () {
     return response()->json(['message' => 'reviews.like まだ未実装']);
 })->name('reviews.like');
-
-Route::post('/cccc', function () {
-    return response()->json(['message' => 'reviews.store まだ未実装']);
-})->name('reviews.store');
