@@ -4,6 +4,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\RankingController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 // 公開ルート（ゲストもアクセス可能）
 Route::get('/', [BookController::class, 'index']);
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 
 // 認証が必要なルート
 Route::middleware('auth')->group(function () {
@@ -43,8 +45,3 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
-
-// 仮ルート
-Route::get('/aaa', function () {
-    return response()->json(['message' => 'ranking.index まだ未実装']);
-})->name('ranking.index');
