@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{book}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::post('/reviews/{review}/like', [LikeController::class, 'toggle'])->name('reviews.like');
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
@@ -46,7 +48,3 @@ Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show')
 Route::get('/aaa', function () {
     return response()->json(['message' => 'ranking.index まだ未実装']);
 })->name('ranking.index');
-
-Route::get('/aaaaaa', function () {
-    return response()->json(['message' => 'reviews.like まだ未実装']);
-})->name('reviews.like');
