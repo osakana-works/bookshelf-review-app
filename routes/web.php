@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{book}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
@@ -42,14 +46,6 @@ Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show')
 Route::get('/aaa', function () {
     return response()->json(['message' => 'ranking.index まだ未実装']);
 })->name('ranking.index');
-
-Route::get('/aaaa', function () {
-    return response()->json(['message' => 'favorites.index まだ未実装']);
-})->name('favorites.index');
-
-Route::get('/aaaaa', function () {
-    return response()->json(['message' => 'favorites.toggle まだ未実装']);
-})->name('favorites.toggle');
 
 Route::get('/aaaaaa', function () {
     return response()->json(['message' => 'reviews.like まだ未実装']);
