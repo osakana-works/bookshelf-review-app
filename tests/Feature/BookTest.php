@@ -67,6 +67,189 @@ class BookTest extends TestCase
     }
 
     /**
+     * 書籍がタイトルが255文字で登録できるテスト
+     */
+    public function test_book_store_validation_passes_with_max_length_title(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => str_repeat('a', 255),
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('books', [
+            'title' => str_repeat('a', 255),
+            'user_id' => $user->id,
+        ]);
+    }
+
+    /**
+     * 書籍がタイトル256文字でバリデーションエラーになるテスト
+     */
+    public function test_book_store_validation_fails_with_too_long_title(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => str_repeat('a', 256),
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('title');
+    }
+
+    /**
+     * 著者名が未入力でバリデーションエラーになる
+     */
+    public function test_book_store_validation_fails_with_missing_author(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => '',
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('author');
+    }
+
+    /**
+     * 著者が255文字で登録できるテスト
+     */
+    public function test_book_store_validation_passes_with_max_length_author(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => str_repeat('a', 255),
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('books', [
+            'author' => str_repeat('a', 255),
+            'user_id' => $user->id,
+        ]);
+    }
+
+    /**
+     * 著者が256文字でバリデーションエラーになるテスト
+     */
+    public function test_book_store_validation_fails_with_too_long_author(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => str_repeat('a', 256),
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('author');
+    }
+
+    /**
+     * ISBNが未入力でバリデーションエラーになるテスト
+     */
+    public function test_book_store_validation_fails_with_missing_isbn(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('isbn');
+    }
+
+    /**
+     * ISBNが13桁で登録できるテスト
+     */
+    public function test_book_store_validation_passes_with_valid_isbn(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('books', [
+            'isbn' => '9784000000001',
+            'user_id' => $user->id,
+        ]);
+    }
+
+    /**
+     * IsBNが12桁でバリデーションエラーになるテスト
+     */
+    public function test_book_store_validation_fails_with_invalid_isbn(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '978400000000',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('isbn');
+    }
+
+    /**
+     * ISBNが14桁でバリデーションエラーになるテスト
+     */
+    public function test_book_store_validation_fails_with_too_long_isbn(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '97840000000012',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('isbn');
+    }
+
+    /**
      * ジャンル未選択でバリデーションエラーになるテスト
      */
     public function test_book_store_validation_fails_without_genre(): void
@@ -102,6 +285,75 @@ class BookTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors('isbn');
+    }
+
+    /**
+     * 出版日が未入力でバリデーションエラーになる
+     */
+    public function test_book_store_validation_fails_with_missing_published_date(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'published_date' => '',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('published_date');
+    }
+
+    /**
+     * 画像URLが255文字で登録できるテスト
+     */
+    public function test_book_store_validation_passes_with_max_length_image_url(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $baseUrl = 'https://example.com/';
+        $imageUrl = $baseUrl.str_repeat('a', 255 - strlen($baseUrl));
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'image_url' => $imageUrl,
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('books', [
+            'image_url' => $imageUrl,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    /**
+     * 画像URLが256文字でバリデーションエラーになるテスト
+     */
+    public function test_book_store_validation_fails_with_too_long_image_url(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $baseUrl = 'https://example.com/';
+        $imageUrl = $baseUrl.str_repeat('a', 256 - strlen($baseUrl));
+
+        $response = $this->actingAs($user)->post('/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'published_date' => '2024-01-01',
+            'image_url' => $imageUrl,
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertSessionHasErrors('image_url');
     }
 
     /**

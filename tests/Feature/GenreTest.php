@@ -76,6 +76,35 @@ class GenreTest extends TestCase
     }
 
     /**
+     * ジャンル名が255文字で登録できる
+     */
+    public function test_genre_store_with_name_of_255_characters(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('genres.store'), [
+            'name' => str_repeat('a', 255),
+        ]);
+        $response->assertRedirect(route('genres.index'));
+        $this->assertDatabaseHas('genres', [
+            'name' => str_repeat('a', 255),
+        ]);
+    }
+
+    /**
+     * ジャンル名が256文字でバリデーションエラーになる
+     */
+    public function test_genre_store_validation_fails_with_name_of_256_characters(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('genres.store'), [
+            'name' => str_repeat('a', 256),
+        ]);
+        $response->assertSessionHasErrors('name');
+    }
+
+    /**
      * ジャンル名の重複登録ができない（一意性チェック）
      */
     public function test_genre_store_validation_fails_with_duplicate_name(): void

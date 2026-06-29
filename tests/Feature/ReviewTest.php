@@ -64,6 +64,78 @@ class ReviewTest extends TestCase
     }
 
     /**
+     * 評価が1で投稿できる
+     */
+    public function test_review_store_with_rating_of_1(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
+            'comment' => '最低評価のレビュー',
+            'rating' => 1,
+        ]);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'book_id' => $book->id,
+            'user_id' => $user->id,
+            'comment' => '最低評価のレビュー',
+            'rating' => 1,
+        ]);
+    }
+
+    /**
+     * 評価が5で投稿できる
+     */
+    public function test_review_store_with_rating_of_5(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
+            'comment' => '最高評価のレビュー',
+            'rating' => 5,
+        ]);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'book_id' => $book->id,
+            'user_id' => $user->id,
+            'comment' => '最高評価のレビュー',
+            'rating' => 5,
+        ]);
+    }
+
+    /**
+     * 評価が0でバリデーションエラーになる
+     */
+    public function test_review_store_validation_fails_with_rating_of_0(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
+            'comment' => '評価が0のレビュー',
+            'rating' => 0,
+        ]);
+        $response->assertSessionHasErrors('rating');
+    }
+
+    /**
+     * 評価が6でバリデーションエラーになる
+     */
+    public function test_review_store_validation_fails_with_rating_of_6(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
+            'comment' => '評価が6のレビュー',
+            'rating' => 6,
+        ]);
+        $response->assertSessionHasErrors('rating');
+    }
+
+    /**
      * バリデーションエラー（comment未入力）
      */
     public function test_review_store_validation_fails_with_missing_comment(): void
@@ -73,6 +145,42 @@ class ReviewTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
             'comment' => '',
+            'rating' => 4,
+        ]);
+        $response->assertSessionHasErrors('comment');
+    }
+
+    /**
+     * コメントが1000文字で投稿できる
+     */
+    public function test_review_store_with_comment_of_1000_characters(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
+            'comment' => str_repeat('a', 1000),
+            'rating' => 4,
+        ]);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'book_id' => $book->id,
+            'user_id' => $user->id,
+            'comment' => str_repeat('a', 1000),
+            'rating' => 4,
+        ]);
+    }
+
+    /**
+     * コメントが1001文字でバリデーションエラーになる
+     */
+    public function test_review_store_validation_fails_with_comment_of_1001_characters(): void
+    {
+        $user = User::factory()->create();
+        $book = Book::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('reviews.store', ['book' => $book->id]), [
+            'comment' => str_repeat('a', 1001),
             'rating' => 4,
         ]);
         $response->assertSessionHasErrors('comment');
