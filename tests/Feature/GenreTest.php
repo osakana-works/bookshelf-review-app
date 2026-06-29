@@ -219,9 +219,9 @@ class GenreTest extends TestCase
     }
 
     /**
-     * ジャンル名を変更せず更新するとバリデーションエラーになる
+     * ジャンル名を変更せず更新してもバリデーションエラーにならない
      */
-    public function test_genre_update_without_changes_fails_validation(): void
+    public function test_genre_update_without_changes_passes_validation(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
@@ -230,6 +230,10 @@ class GenreTest extends TestCase
             'name' => $genre->name,
         ]);
 
-        $response->assertSessionHasErrors('name');
+        $response->assertRedirect(route('genres.index'));
+        $this->assertDatabaseHas('genres', [
+            'id' => $genre->id,
+            'name' => $genre->name,
+        ]);
     }
 }
