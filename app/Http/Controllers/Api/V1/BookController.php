@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\BookRequest;
 use App\Http\Requests\Api\V1\BookSearchRequest;
+use App\Http\Resources\Api\V1\BookDetailResource;
 use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
 use Illuminate\Http\JsonResponse;
@@ -52,13 +53,13 @@ class BookController extends Controller
     /**
      * 書籍詳細API
      */
-    public function show(Book $book): BookResource
+    public function show(Book $book): BookDetailResource
     {
         $book->load('genres', 'reviews.user')
             ->loadAvg('reviews', 'rating')
             ->loadCount('reviews');
 
-        return new BookResource($book);
+        return new BookDetailResource($book);
     }
 
     /**

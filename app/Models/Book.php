@@ -23,6 +23,10 @@ class Book extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'published_date' => 'date',
+    ];
+
     /**
      * 本の登録者を取得する
      */
