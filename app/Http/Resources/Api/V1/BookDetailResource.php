@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BookResource extends JsonResource
+class BookDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -26,6 +26,7 @@ class BookResource extends JsonResource
             }),
             'reviews_avg_rating' => $this->reviews_avg_rating,
             'reviews_count' => $this->reviews_count,
+            'reviews' => ReviewResource::collection($this->reviews),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
