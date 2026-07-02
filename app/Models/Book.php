@@ -61,6 +61,8 @@ class Book extends Model
 
     /**
      * キーワード検索
+     *
+     * @return Builder<Book>
      */
     public function scopeSearchByKeyword(Builder $query, ?string $keyword): Builder
     {
@@ -76,6 +78,8 @@ class Book extends Model
 
     /**
      * ジャンルで絞り込み
+     *
+     * @return Builder<Book>
      */
     public function scopeFilterByGenre(Builder $query, ?int $genreId): Builder
     {
