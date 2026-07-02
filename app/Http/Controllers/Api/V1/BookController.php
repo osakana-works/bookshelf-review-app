@@ -30,14 +30,6 @@ class BookController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * 書籍登録API
      */
     public function store(BookRequest $request): JsonResponse
@@ -60,14 +52,6 @@ class BookController extends Controller
             ->loadCount('reviews');
 
         return new BookDetailResource($book);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**

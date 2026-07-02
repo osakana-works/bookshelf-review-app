@@ -38,9 +38,8 @@ class ReviewController extends Controller
      * レビュー編集フォームを表示する
      *
      * @param  Review  $review  対象のレビュー
-     * @return View
      */
-    public function edit(Review $review)
+    public function edit(Review $review): View
     {
         $this->authorize('update', $review);
 
