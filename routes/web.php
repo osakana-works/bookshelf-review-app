@@ -42,6 +42,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{book}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('/reviews/{review}/like', [LikeController::class, 'toggle'])->name('reviews.like');
+
+    //応用機能実装中の仮ルート
+    Route::get('/reports', fn () => '実装中')->name('reports.index');
+
+    Route::get('/reading-plans', fn () => '実装中')->name('reading-plans.index');
+    Route::get('/reading-plans/create', fn () => '実装中')->name('reading-plans.create');
+    Route::post('/reading-plans', fn () => '実装中')->name('reading-plans.store');
+    Route::get('/reading-plans/{readingPlan}/edit', fn () => '実装中')->name('reading-plans.edit');
+    Route::put('/reading-plans/{readingPlan}', fn () => '実装中')->name('reading-plans.update');
+    Route::delete('/reading-plans/{readingPlan}', fn () => '実装中')->name('reading-plans.destroy');
+    Route::post('/reading-plans/{readingPlan}/complete', fn () => '実装中')->name('reading-plans.complete');
+
+    Route::get('/notifications', fn () => '実装中')->name('notifications.index');
+    Route::post('/notifications/{id}/read', fn () => '実装中')->name('notifications.read');
+
 });
 
+
+//｛book｝が別のルートと競合するため、最後に配置する
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
