@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/favorites/{book}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::post('/reviews/{review}/like', [LikeController::class, 'toggle'])->name('reviews.like');
 
-    //応用機能実装中の仮ルート
+    // 応用機能実装中の仮ルート
     Route::get('/reports', fn () => '実装中')->name('reports.index');
 
     Route::get('/reading-plans', fn () => '実装中')->name('reading-plans.index');
@@ -59,6 +59,5 @@ Route::middleware('auth')->group(function () {
 
 });
 
-
-//｛book｝が別のルートと競合するため、最後に配置する
+// ｛book｝が別のルートと競合するため、最後に配置する
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
