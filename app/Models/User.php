@@ -76,4 +76,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Book::class, 'favorites')->withTimestamps();
     }
+
+    /**
+     * ユーザーが作成したリーディングプランの一覧を取得する
+     */
+    public function readingPlans(): HasMany
+    {
+        return $this->hasMany(ReadingPlan::class);
+    }
 }
