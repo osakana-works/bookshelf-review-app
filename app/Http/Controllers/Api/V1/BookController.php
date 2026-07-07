@@ -34,7 +34,10 @@ class BookController extends Controller
      */
     public function store(BookRequest $request): JsonResponse
     {
-        $book = Book::create($request->validated());
+        $book = Book::create([
+            ...$request->validated(),
+            'user_id' => $request->user()->id,
+        ]);
         $book->genres()->sync($request->genres);
 
         return response()->json([
@@ -58,7 +61,9 @@ class BookController extends Controller
      * 書籍更新API
      */
     public function update(BookRequest $request, Book $book): JsonResponse
-    {
+    {   
+        $this->authorize('update', $book);
+
         $book->update($request->validated());
         $book->genres()->sync($request->genres);
 
@@ -71,7 +76,8 @@ class BookController extends Controller
      * 書籍削除API
      */
     public function destroy(Book $book): JsonResponse
-    {
+    {   
+        $this->authorize('delete', $book);
         $book->delete();
 
         return response()->json(null, 204);
