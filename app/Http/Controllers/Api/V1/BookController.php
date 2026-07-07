@@ -61,7 +61,7 @@ class BookController extends Controller
      * 書籍更新API
      */
     public function update(BookRequest $request, Book $book): JsonResponse
-    {   
+    {
         $this->authorize('update', $book);
 
         $book->update($request->validated());
@@ -76,7 +76,7 @@ class BookController extends Controller
      * 書籍削除API
      */
     public function destroy(Book $book): JsonResponse
-    {   
+    {
         $this->authorize('delete', $book);
         $book->delete();
 
