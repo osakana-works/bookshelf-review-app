@@ -91,4 +91,12 @@ class Book extends Model
 
         return $query;
     }
+
+    /**
+     * この本に紐づく読書計画一覧を取得する
+     */
+    public function readingPlans(): HasMany
+    {
+        return $this->hasMany(ReadingPlan::class);
+    }
 }
