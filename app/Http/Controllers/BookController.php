@@ -6,6 +6,7 @@ use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -13,14 +14,18 @@ class BookController extends Controller
     /**
      * 書籍一覧を表示する
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $books = Book::with(['genres', 'reviews'])
             ->withAvg('reviews', 'rating')
-            ->latest()
+            ->searchByKeyword($request->keyword)
+            ->filterByGenre($request->genre)
+            ->sortBy($request->sort)
             ->paginate(10);
 
-        return view('books.index', compact('books'));
+        $genres = Genre::all();
+
+        return view('books.index', compact('books', 'genres'));
     }
 
     /**
