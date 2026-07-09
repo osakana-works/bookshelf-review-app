@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use App\Models\Genre;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -115,5 +117,48 @@ class BookController extends Controller
         return redirect()
             ->route('books.index')
             ->with('success', '書籍を削除しました。');
+    }
+
+    /**
+     * ISBNからGoogleBooksの書籍情報を取得する
+     */
+    public function fetchByIsbn(string $isbn): JsonResponse
+    {
+        $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
+            'q' => "isbn:{$isbn}",
+            'key' => config('services.google_books.key'),
+        ]);
+
+        $data = $response->json();
+
+        if (empty($data['items'])) {
+            return response()->json(['error' => '該当する書籍が見つかりませんでした。']);
+        }
+
+        $volumeInfo = $data['items'][0]['volumeInfo'];
+
+        return response()->json([
+            'title' => $volumeInfo['title'] ?? '',
+            'author' => implode(', ', $volumeInfo['authors'] ?? []),
+            'description' => $volumeInfo['description'] ?? '',
+            'image_url' => $volumeInfo['imageLinks']['thumbnail'] ?? '',
+            'published_date' => $this->formatPublishedDate($volumeInfo['publishedDate'] ?? null),
+        ]);
+    }
+
+    /**
+     * Google Books APIのpublishedDateを補完してY-m-d形式に整形する
+     */
+    private function formatPublishedDate(?string $publishedDate): ?string
+    {
+        if (! $publishedDate) {
+            return null;
+        }
+
+        return match (strlen($publishedDate)) {
+            4 => $publishedDate.'-01-01',      // "2026" → "2026-01-01"
+            7 => $publishedDate.'-01',          // "2026-03" → "2026-03-01"
+            default => $publishedDate,          // "2026-03-15" のような完全な形式はそのまま
+        };
     }
 }
