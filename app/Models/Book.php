@@ -93,6 +93,20 @@ class Book extends Model
     }
 
     /**
+     * sortで並び変え
+     */
+    public function scopeSortBy(Builder $query, ?string $sort): Builder
+    {
+        return match ($sort) {
+            'newest' => $query->latest(),               // 新しい順
+            'oldest' => $query->oldest(),               // 古い順
+            'rating' => $query->orderByDesc('reviews_avg_rating'), // 評価順
+            'title' => $query->orderBy('title'),       // タイトル順
+            default => $query->latest(),               // デフォルト
+        };
+    }
+
+    /**
      * この本に紐づく読書計画一覧を取得する
      */
     public function readingPlans(): HasMany
