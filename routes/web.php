@@ -5,6 +5,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/books/isbn/{isbn}', [BookController::class, 'fetchByIsbn'])->name('books.isbn');
 
     // 応用機能実装中の仮ルート
-    Route::get('/reports', fn () => '実装中')->name('reports.index');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     Route::get('/reading-plans', fn () => '実装中')->name('reading-plans.index');
     Route::get('/reading-plans/create', fn () => '実装中')->name('reading-plans.create');
