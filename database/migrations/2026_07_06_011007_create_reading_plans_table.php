@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('book_id')->constrained()->onDelete('cascade');
             $table->date('target_date');
-            $table->unsignedTinyInteger('status')->default(0); // 0: NotStarted, 1: InProgress, 2: Completed, 3: Overdue
+            $table->unsignedTinyInteger('status')->default(0); // 0: InProgress, 1: Completed, 2: Overdue
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });

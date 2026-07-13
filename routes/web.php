@@ -5,6 +5,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ReadingPlanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
@@ -46,16 +47,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/books/isbn/{isbn}', [BookController::class, 'fetchByIsbn'])->name('books.isbn');
 
-    // 応用機能実装中の仮ルート
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
-    Route::get('/reading-plans', fn () => '実装中')->name('reading-plans.index');
-    Route::get('/reading-plans/create', fn () => '実装中')->name('reading-plans.create');
-    Route::post('/reading-plans', fn () => '実装中')->name('reading-plans.store');
-    Route::get('/reading-plans/{readingPlan}/edit', fn () => '実装中')->name('reading-plans.edit');
-    Route::put('/reading-plans/{readingPlan}', fn () => '実装中')->name('reading-plans.update');
-    Route::delete('/reading-plans/{readingPlan}', fn () => '実装中')->name('reading-plans.destroy');
-    Route::post('/reading-plans/{readingPlan}/complete', fn () => '実装中')->name('reading-plans.complete');
+    Route::get('/reading-plans', [ReadingPlanController::class, 'index'])->name('reading-plans.index');
+    Route::get('/reading-plans/create', [ReadingPlanController::class, 'create'])->name('reading-plans.create');
+    Route::post('/reading-plans', [ReadingPlanController::class, 'store'])->name('reading-plans.store');
+    Route::get('/reading-plans/{plan}/edit', [ReadingPlanController::class, 'edit'])->name('reading-plans.edit');
+    Route::put('/reading-plans/{plan}', [ReadingPlanController::class, 'update'])->name('reading-plans.update');
+    Route::delete('/reading-plans/{plan}', [ReadingPlanController::class, 'destroy'])->name('reading-plans.destroy');
+    Route::post('/reading-plans/{plan}/complete', [ReadingPlanController::class, 'complete'])->name('reading-plans.complete');
 
     Route::get('/notifications', fn () => '実装中')->name('notifications.index');
     Route::post('/notifications/{id}/read', fn () => '実装中')->name('notifications.read');
