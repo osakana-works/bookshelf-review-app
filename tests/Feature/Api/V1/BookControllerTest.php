@@ -7,6 +7,7 @@ use App\Models\Genre;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class BookControllerTest extends TestCase
@@ -248,13 +249,13 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -269,13 +270,13 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -293,13 +294,13 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -318,13 +319,13 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => '',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -340,13 +341,13 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => '',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -356,41 +357,19 @@ class BookControllerTest extends TestCase
     }
 
     /**
-     * 2-9-17: isbnが未入力だと422と日本語エラーメッセージが返る
-     */
-    public function test_store_validation_fails_with_missing_isbn(): void
-    {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
-
-        $response = $this->postJson('/api/v1/books', [
-            'title' => 'テスト書籍',
-            'author' => 'テスト著者',
-            'isbn' => '',
-            'published_date' => '2024-01-01',
-            'user_id' => $user->id,
-            'genres' => [$genre->id],
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors('isbn')
-            ->assertJsonFragment(['isbn' => ['ISBNは必須です。']]);
-    }
-
-    /**
      * 2-9-18: isbnが13桁でないと422になる
      */
     public function test_store_validation_fails_with_invalid_isbn_length(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '123456789012', // 12桁
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -405,6 +384,7 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
         $existingBook = Book::factory()->create(['isbn' => '9784000000001']);
 
         $response = $this->postJson('/api/v1/books', [
@@ -412,33 +392,11 @@ class BookControllerTest extends TestCase
             'author' => '別の著者',
             'isbn' => $existingBook->isbn,
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors('isbn');
-    }
-
-    /**
-     * 2-9-20: published_dateが未入力だと422になる
-     */
-    public function test_store_validation_fails_with_missing_published_date(): void
-    {
-        $user = User::factory()->create();
-        $genre = Genre::factory()->create();
-
-        $response = $this->postJson('/api/v1/books', [
-            'title' => 'テスト書籍',
-            'author' => 'テスト著者',
-            'isbn' => '9784000000001',
-            'published_date' => '',
-            'user_id' => $user->id,
-            'genres' => [$genre->id],
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors('published_date');
     }
 
     /**
@@ -448,13 +406,13 @@ class BookControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => 'not-a-date',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -463,38 +421,18 @@ class BookControllerTest extends TestCase
     }
 
     /**
-     * 2-9-22: user_idが存在しないIDだと422になる
-     */
-    public function test_store_validation_fails_with_nonexistent_user_id(): void
-    {
-        $genre = Genre::factory()->create();
-
-        $response = $this->postJson('/api/v1/books', [
-            'title' => 'テスト書籍',
-            'author' => 'テスト著者',
-            'isbn' => '9784000000001',
-            'published_date' => '2024-01-01',
-            'user_id' => 9999,
-            'genres' => [$genre->id],
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors('user_id');
-    }
-
-    /**
      * 2-9-23: genresが未指定（空配列）だと422になる
      */
     public function test_store_validation_fails_with_empty_genres(): void
     {
         $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [],
         ]);
 
@@ -508,13 +446,13 @@ class BookControllerTest extends TestCase
     public function test_store_validation_fails_with_nonexistent_genre_id(): void
     {
         $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/v1/books', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [9999],
         ]);
 
@@ -527,15 +465,16 @@ class BookControllerTest extends TestCase
      */
     public function test_update_returns_200_with_message(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/v1/books/{$book->id}", [
             'title' => '更新後タイトル',
             'author' => $book->author,
             'isbn' => $book->isbn,
             'published_date' => $book->published_date->format('Y-m-d'),
-            'user_id' => $book->user_id,
             'genres' => [$genre->id],
         ]);
 
@@ -548,15 +487,16 @@ class BookControllerTest extends TestCase
      */
     public function test_update_reflects_changes_in_database(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $this->putJson("/api/v1/books/{$book->id}", [
             'title' => '更新後タイトル',
             'author' => $book->author,
             'isbn' => $book->isbn,
             'published_date' => $book->published_date->format('Y-m-d'),
-            'user_id' => $book->user_id,
             'genres' => [$genre->id],
         ]);
 
@@ -571,17 +511,18 @@ class BookControllerTest extends TestCase
      */
     public function test_update_syncs_genre_relation(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
         $oldGenre = Genre::factory()->create();
         $newGenre = Genre::factory()->create();
         $book->genres()->attach($oldGenre->id);
+        Sanctum::actingAs($user);
 
         $this->putJson("/api/v1/books/{$book->id}", [
             'title' => $book->title,
             'author' => $book->author,
             'isbn' => $book->isbn,
             'published_date' => $book->published_date->format('Y-m-d'),
-            'user_id' => $book->user_id,
             'genres' => [$newGenre->id],
         ]);
 
@@ -602,13 +543,13 @@ class BookControllerTest extends TestCase
     {
         $genre = Genre::factory()->create();
         $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->putJson('/api/v1/books/9999', [
             'title' => 'テスト書籍',
             'author' => 'テスト著者',
             'isbn' => '9784000000001',
             'published_date' => '2024-01-01',
-            'user_id' => $user->id,
             'genres' => [$genre->id],
         ]);
 
@@ -621,15 +562,16 @@ class BookControllerTest extends TestCase
      */
     public function test_update_with_own_isbn_does_not_trigger_validation_error(): void
     {
-        $book = Book::factory()->create(['isbn' => '9784000000001']);
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id, 'isbn' => '9784000000001']);
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/v1/books/{$book->id}", [
             'title' => '更新後タイトル',
             'author' => $book->author,
             'isbn' => $book->isbn,
             'published_date' => $book->published_date->format('Y-m-d'),
-            'user_id' => $book->user_id,
             'genres' => [$genre->id],
         ]);
 
@@ -641,16 +583,17 @@ class BookControllerTest extends TestCase
      */
     public function test_update_validation_fails_with_other_books_isbn(): void
     {
+        $user = User::factory()->create();
         $otherBook = Book::factory()->create(['isbn' => '9784000000002']);
-        $book = Book::factory()->create(['isbn' => '9784000000001']);
+        $book = Book::factory()->create(['user_id' => $user->id, 'isbn' => '9784000000001']);
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/v1/books/{$book->id}", [
             'title' => $book->title,
             'author' => $book->author,
             'isbn' => $otherBook->isbn,
             'published_date' => $book->published_date->format('Y-m-d'),
-            'user_id' => $book->user_id,
             'genres' => [$genre->id],
         ]);
 
@@ -663,15 +606,16 @@ class BookControllerTest extends TestCase
      */
     public function test_update_validation_fails_with_missing_title(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
         $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/v1/books/{$book->id}", [
             'title' => '',
             'author' => $book->author,
             'isbn' => $book->isbn,
             'published_date' => $book->published_date->format('Y-m-d'),
-            'user_id' => $book->user_id,
             'genres' => [$genre->id],
         ]);
 
@@ -684,7 +628,9 @@ class BookControllerTest extends TestCase
      */
     public function test_destroy_returns_204(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
+        Sanctum::actingAs($user);
 
         $response = $this->deleteJson("/api/v1/books/{$book->id}");
 
@@ -696,7 +642,9 @@ class BookControllerTest extends TestCase
      */
     public function test_destroy_removes_book_from_database(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
+        Sanctum::actingAs($user);
 
         $this->deleteJson("/api/v1/books/{$book->id}");
 
@@ -708,8 +656,10 @@ class BookControllerTest extends TestCase
      */
     public function test_destroy_cascades_to_reviews(): void
     {
-        $book = Book::factory()->create();
-        $review = Review::factory()->create(['book_id' => $book->id]);
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
+        Sanctum::actingAs($user);
+        $review = Review::factory()->create(['user_id' => $user->id, 'book_id' => $book->id]);
 
         $this->deleteJson("/api/v1/books/{$book->id}");
 
@@ -721,8 +671,9 @@ class BookControllerTest extends TestCase
      */
     public function test_destroy_cascades_to_favorites(): void
     {
-        $book = Book::factory()->create();
         $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
+        Sanctum::actingAs($user);
         $user->favoriteBooks()->attach($book->id);
 
         $this->deleteJson("/api/v1/books/{$book->id}");
@@ -738,7 +689,10 @@ class BookControllerTest extends TestCase
      */
     public function test_destroy_cascades_to_book_genre(): void
     {
-        $book = Book::factory()->create();
+        $user = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $user->id]);
+        Sanctum::actingAs($user);
+
         $genre = Genre::factory()->create();
         $book->genres()->attach($genre->id);
 
@@ -755,9 +709,61 @@ class BookControllerTest extends TestCase
      */
     public function test_destroy_returns_404_for_nonexistent_id(): void
     {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
         $response = $this->deleteJson('/api/v1/books/9999');
 
         $response->assertStatus(404)
             ->assertJson(['message' => 'リソースが見つかりませんでした。']);
+    }
+
+    // =========================================
+    // Sanctum認証・nullable化の確認
+    // =========================================
+
+    /**
+     * 3-6-13: isbnが未入力でも登録できる（nullable化の確認）
+     */
+    public function test_store_succeeds_without_isbn(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/books/', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'published_date' => '2024-01-01',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('books', [
+            'title' => 'テスト書籍',
+            'isbn' => null,
+        ]);
+    }
+
+    /**
+     * 3-6-14: published_dateが未入力でも登録できる（nullable化の確認）
+     */
+    public function test_store_succeeds_without_published_date(): void
+    {
+        $user = User::factory()->create();
+        $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/books/', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784000000001',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('books', [
+            'title' => 'テスト書籍',
+            'published_date' => null,
+        ]);
     }
 }
