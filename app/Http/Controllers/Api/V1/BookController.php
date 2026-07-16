@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\BookResource;
 use App\Models\Book;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -34,11 +35,13 @@ class BookController extends Controller
      */
     public function store(BookRequest $request): JsonResponse
     {
-        $book = Book::create([
-            ...$request->validated(),
-            'user_id' => $request->user()->id,
-        ]);
-        $book->genres()->sync($request->genres);
+        DB::transaction(function () use ($request) {
+            $book = Book::create([
+                ...$request->validated(),
+                'user_id' => $request->user()->id,
+            ]);
+            $book->genres()->sync($request->genres);
+        });
 
         return response()->json([
             'message' => '書籍を登録しました。',
@@ -64,8 +67,10 @@ class BookController extends Controller
     {
         $this->authorize('update', $book);
 
-        $book->update($request->validated());
-        $book->genres()->sync($request->genres);
+        DB::transaction(function () use ($request, $book) {
+            $book->update($request->validated());
+            $book->genres()->sync($request->genres);
+        });
 
         return response()->json([
             'message' => '書籍を更新しました。',
