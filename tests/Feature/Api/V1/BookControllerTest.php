@@ -766,4 +766,107 @@ class BookControllerTest extends TestCase
             'published_date' => null,
         ]);
     }
+
+    /**
+     * 3-6-1: 未認証で書籍を登録しようとすると401が返る
+     */
+    public function test_store_returns_401_when_unauthenticated(): void
+    {
+        $genre = Genre::factory()->create();
+
+        $response = $this->postJson('/api/v1/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    /**
+     * 3-6-2: 未認証で書籍を更新しようとすると401が返る
+     */
+    public function test_update_returns_401_when_unauthenticated(): void
+    {
+        $book = Book::factory()->create();
+        $genre = Genre::factory()->create();
+
+        $response = $this->putJson("/api/v1/books/{$book->id}", [
+            'title' => '更新タイトル',
+            'author' => $book->author,
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    /**
+     * 3-6-3: 未認証で書籍を削除しようとすると401が返る
+     */
+    public function test_destroy_returns_401_when_unauthenticated(): void
+    {
+        $book = Book::factory()->create();
+
+        $response = $this->deleteJson("/api/v1/books/{$book->id}");
+
+        $response->assertStatus(401);
+    }
+
+    /**
+     * 3-6-5: 認証済みでも、他人の書籍を更新しようとすると403が返る
+     */
+    public function test_update_returns_403_when_not_owner(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $owner->id]);
+        $genre = Genre::factory()->create();
+        Sanctum::actingAs($other);
+
+        $response = $this->putJson("/api/v1/books/{$book->id}", [
+            'title' => '更新タイトル',
+            'author' => $book->author,
+            'genres' => [$genre->id],
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * 3-6-6: 認証済みでも、他人の書籍を削除しようとすると403が返る
+     */
+    public function test_destroy_returns_403_when_not_owner(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $book = Book::factory()->create(['user_id' => $owner->id]);
+        Sanctum::actingAs($other);
+
+        $response = $this->deleteJson("/api/v1/books/{$book->id}");
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * 3-6-15: user_idを送信しても無視され、認証中のユーザーIDで登録される
+     */
+    public function test_store_ignores_submitted_user_id(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $genre = Genre::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/v1/books', [
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'user_id' => $otherUser->id,
+            'genres' => [$genre->id],
+        ]);
+
+        $this->assertDatabaseHas('books', [
+            'title' => 'テスト書籍',
+            'user_id' => $user->id,
+        ]);
+    }
 }
