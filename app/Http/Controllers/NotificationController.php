@@ -7,6 +7,9 @@ use Illuminate\View\View;
 
 class NotificationController extends Controller
 {
+    /**
+     * 通知一覧を表示する
+     */
     public function index(): View
     {
         $notifications = auth()->user()->notifications;
@@ -14,6 +17,9 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications'));
     }
 
+    /**
+     * 通知を既読にする
+     */
     public function read(string $id): RedirectResponse
     {
         $notification = auth()->user()->notifications()->findOrFail($id);
