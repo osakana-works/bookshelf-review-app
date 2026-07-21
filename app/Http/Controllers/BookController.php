@@ -24,7 +24,8 @@ class BookController extends Controller
             ->searchByKeyword($request->keyword)
             ->filterByGenre($request->genre)
             ->sortBy($request->sort)
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();;
 
         $genres = Genre::all();
 
