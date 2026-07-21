@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BookRequest;
+use App\Http\Requests\BookSearchRequest;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
@@ -17,7 +17,7 @@ class BookController extends Controller
     /**
      * 書籍一覧を表示する
      */
-    public function index(Request $request): View
+    public function index(BookSearchRequest $request): View
     {
         $books = Book::with(['genres', 'reviews'])
             ->withAvg('reviews', 'rating')
@@ -25,7 +25,7 @@ class BookController extends Controller
             ->filterByGenre($request->genre)
             ->sortBy($request->sort)
             ->paginate(10)
-            ->withQueryString();;
+            ->withQueryString();
 
         $genres = Genre::all();
 
