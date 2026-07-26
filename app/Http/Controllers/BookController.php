@@ -19,7 +19,7 @@ class BookController extends Controller
      */
     public function index(BookSearchRequest $request): View
     {
-        $books = Book::with(['genres', 'reviews'])
+        $books = Book::with('genres')
             ->withAvg('reviews', 'rating')
             ->searchByKeyword($request->keyword)
             ->filterByGenre($request->genre)
