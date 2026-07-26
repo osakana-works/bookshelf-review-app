@@ -171,9 +171,9 @@ class BookTest extends TestCase
     }
 
     /**
-     * ISBNが未入力でバリデーションエラーになるテスト
+     * ISBNが未入力でも登録できるテスト
      */
-    public function test_book_store_validation_fails_with_missing_isbn(): void
+    public function test_book_store_validation_passes_with_missing_isbn(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
@@ -186,7 +186,11 @@ class BookTest extends TestCase
             'genres' => [$genre->id],
         ]);
 
-        $response->assertSessionHasErrors('isbn');
+        $response->assertRedirect();
+        $this->assertDatabaseHas('books', [
+            'title' => 'テスト書籍',
+            'isbn' => null,
+        ]);
     }
 
     /**
@@ -289,9 +293,9 @@ class BookTest extends TestCase
     }
 
     /**
-     * 出版日が未入力でバリデーションエラーになる
+     * 出版日が未入力でも登録できるテスト
      */
-    public function test_book_store_validation_fails_with_missing_published_date(): void
+    public function test_book_store_validation_passes_with_missing_published_date(): void
     {
         $user = User::factory()->create();
         $genre = Genre::factory()->create();
@@ -304,7 +308,11 @@ class BookTest extends TestCase
             'genres' => [$genre->id],
         ]);
 
-        $response->assertSessionHasErrors('published_date');
+        $response->assertRedirect();
+        $this->assertDatabaseHas('books', [
+            'title' => 'テスト書籍',
+            'published_date' => null,
+        ]);
     }
 
     /**
@@ -486,6 +494,19 @@ class BookTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('夏目漱石');
         $response->assertDontSee('別の著者');
+    }
+
+    /**
+     * 3-1-3: キーワードに一致しない書籍は表示されない
+     */
+    public function test_search_books_with_no_matching_keyword_returns_empty(): void
+    {
+        Book::factory()->create(['title' => '吾輩は猫である']);
+
+        $response = $this->get('/books?keyword=存在しないキーワード');
+
+        $response->assertStatus(200);
+        $response->assertDontSee('吾輩は猫である');
     }
 
     /**

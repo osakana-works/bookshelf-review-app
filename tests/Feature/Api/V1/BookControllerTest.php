@@ -126,6 +126,15 @@ class BookControllerTest extends TestCase
     }
 
     /**
+     * 存在しないgenre_idを指定すると422になる
+     */
+    public function test_index_validation_fails_with_nonexistent_genre_id(): void
+    {
+        $response = $this->getJson('/api/v1/books?genre_id=99999');
+        $response->assertStatus(422);
+    }
+
+    /**
      * 2-9-6: per_pageパラメータでページネーション件数が変わる
      */
     public function test_index_respects_per_page_parameter(): void
