@@ -232,7 +232,7 @@ sail artisan reading-plans:update-statuses
 ./vendor/bin/sail artisan test --coverage
 ```
 
-現在のテストカバレッジ: 92.1%（213件のテスト、481アサーション）
+現在のテストカバレッジ: 92.1%（215件・484アサーション）
 
 ## 機能一覧
 
