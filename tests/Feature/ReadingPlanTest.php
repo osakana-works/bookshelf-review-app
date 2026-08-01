@@ -7,6 +7,8 @@ use App\Models\Book;
 use App\Models\ReadingPlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ReadingPlanTest extends TestCase
@@ -381,6 +383,65 @@ class ReadingPlanTest extends TestCase
         $this->assertDatabaseHas('reading_plans', [
             'id' => $readingPlan->id,
             'book_id' => $readingPlan->book_id, // book_idは変更されていないことを確認
+        ]);
+    }
+
+    /**
+     * 期限切れの計画の期日を更新すると、ステータスが進行中に戻る
+     */
+    public function test_update_target_date_of_overdue_reading_plan_resets_status_to_in_progress(): void
+    {
+
+        $user = User::factory()->create();
+        $readingPlan = ReadingPlan::factory()->create([
+            'user_id' => $user->id,
+            'status' => ReadingPlanStatus::Overdue,
+        ]);
+
+        $response = $this->actingAs($user)->put(route('reading-plans.update', $readingPlan), [
+            'target_date' => now()->addDays(10)->toDateString(),
+        ]);
+
+        $response->assertRedirect(route('reading-plans.index'));
+        $this->assertDatabaseHas('reading_plans', [
+            'id' => $readingPlan->id,
+            'status' => ReadingPlanStatus::InProgress,
+        ]);
+    }
+
+    /**
+     * 計画を削除すると、関連するリマインダー通知も同時に削除される
+     */
+    public function test_deleting_reading_plan_also_deletes_related_reminder_notifications(): void
+    {
+        $user = User::factory()->create();
+        $readingPlan = ReadingPlan::factory()->create([
+            'user_id' => $user->id,
+            'status' => ReadingPlanStatus::InProgress,
+        ]);
+
+        DB::table('notifications')->insert([
+            'id' => (string) Str::uuid(),
+            'type' => 'App\Notifications\ReadingPlanReminder',
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->id,
+            'data' => json_encode([
+                'title' => 'リマインダー',
+                'body' => 'テスト通知',
+                'timing' => 'on_due_date',
+                'reading_plan_id' => $readingPlan->id,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('reading-plans.destroy', $readingPlan));
+        $response->assertRedirect(route('reading-plans.index'));
+        $this->assertDatabaseMissing('reading_plans', [
+            'id' => $readingPlan->id,
+        ]);
+        $this->assertDatabaseMissing('notifications', [
+            'notifiable_id' => $user->id,
         ]);
     }
 }

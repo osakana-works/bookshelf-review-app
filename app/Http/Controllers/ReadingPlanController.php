@@ -9,6 +9,7 @@ use App\Models\Book;
 use App\Models\ReadingPlan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ReadingPlanController extends Controller
@@ -77,6 +78,7 @@ class ReadingPlanController extends Controller
 
         $plan->update([
             'target_date' => $request->target_date,
+            'status' => ReadingPlanStatus::InProgress,
         ]);
 
         return redirect()->route('reading-plans.index')->with('success', '読書計画を更新しました。');
@@ -89,7 +91,14 @@ class ReadingPlanController extends Controller
     {
         $this->authorize('delete', $plan);
 
-        $plan->delete();
+        DB::transaction(function () use ($plan) {
+            DB::table('notifications')
+                ->where('notifiable_id', $plan->user_id)
+                ->whereJsonContains('data->reading_plan_id', $plan->id)
+                ->delete();
+
+            $plan->delete();
+        });
 
         return redirect()->route('reading-plans.index')->with('success', '読書計画を削除しました。');
     }

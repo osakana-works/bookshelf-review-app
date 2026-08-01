@@ -87,4 +87,40 @@ class RankingTest extends TestCase
         // 11冊目のタイトルは表示されないことを確認
         $response->assertDontSee('Book 11');
     }
+
+    /**
+     * 書籍が平均評価の降順で並ぶことを検証する
+     */
+    public function test_books_are_ordered_by_average_rating_descending(): void
+    {
+        $lowRatedBook = Book::factory()->create(['title' => '低評価書籍']);
+        $lowRatedBook->reviews()->create([
+            'user_id' => $lowRatedBook->user_id,
+            'comment' => 'まあまあでした。',
+            'rating' => 2,
+        ]);
+
+        $highRatedBook = Book::factory()->create(['title' => '高評価書籍']);
+        $highRatedBook->reviews()->create([
+            'user_id' => $highRatedBook->user_id,
+            'comment' => 'とても良かったです。',
+            'rating' => 5,
+        ]);
+
+        $midRatedBook = Book::factory()->create(['title' => '中評価書籍']);
+        $midRatedBook->reviews()->create([
+            'user_id' => $midRatedBook->user_id,
+            'comment' => '普通でした。',
+            'rating' => 3,
+        ]);
+
+        $response = $this->get(route('ranking.index'));
+
+        $response->assertStatus(200);
+        $response->assertSeeInOrder([
+            $highRatedBook->title,
+            $midRatedBook->title,
+            $lowRatedBook->title,
+        ]);
+    }
 }
